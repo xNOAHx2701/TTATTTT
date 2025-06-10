@@ -18,19 +18,16 @@ int mod(int x,int y)
 
 vector <int> mang(long long x,int h)
 {  vector <int> X;
-   for(int i=h-1;i>=0;i--)
-     {
-        int j=x/pow(2,w*i);
+   for (int i = h - 1; i >= 0; i--) {
+        int shift = w * i;
+        int j = (x >> shift) & ((1 << w) - 1); // lấy w-bit từ vị trí shift
         X.push_back(j);
-        x=x-j*pow(2,w*i);
-     }
+    }
      return X;
 }
 
 vector <int> dao(vector <int> P)
-{  vector <int> Q;
-   for(int i=P.size()-1;i>=0;i--)
-     Q.push_back(P[i]);
+{  vector<int> Q(P.rbegin(), P.rend());
    return Q;
 }
 
@@ -39,7 +36,7 @@ struct KQ cong (vector <int> A, vector <int> B, int F)
 {
    bool e=true;
    vector <int> C;
-   int T=pow(2,w);
+   int T = 1 << w;
    int c0=A[F-1]+B[F-1];
    if(c0<T) {e=false;
              C.push_back(c0);}
@@ -67,7 +64,7 @@ struct KQ tru ( vector <int> A, vector <int> B, int F)
 {
    bool e;
    vector <int> C;
-   int T=pow(2,w);
+   int T = 1 << w;
    int c0=A[F-1]-B[F-1];
    if(c0<T&&c0>=0) {e=false;
                     C.push_back(c0);}
@@ -94,7 +91,8 @@ struct KQ tru ( vector <int> A, vector <int> B, int F)
 bool sosanh(vector <int> A, vector <int> B) 
 {
    for(int i=0;i<A.size();i++)
-     if(A[i]>B[i]) return true;
+     {if(A[i]>B[i]) return true;
+     if(A[i]<B[i]) return false;}
    return false;
 }
 
@@ -102,22 +100,30 @@ bool sosanh(vector <int> A, vector <int> B)
 
 int main()
 {  cin >> p;
-   int t=round(log2(p)/w);
+   int t=ceil(log2(p)/w);
    cin>>a; cin>>b;
    cout<<"cong a va b chon 1: \n";
    cout<<"tru a va b chon 2: \n";
+   cout<<"cong a va b tren Fp chon 3: \n";
+   cout<<"tru a va b Fp chon 4: \n";
    int luachon;
    cin>>luachon;
    struct KQ ketqua;
+   
    switch (luachon)
    {
       case 1: ketqua=cong(mang(a,t),mang(b,t),t); 
-             if(ketqua.nho==1) ketqua=tru(ketqua.array,mang(p,t),t);  
-             else if(sosanh(ketqua.array,mang(p,t))==true) ketqua=tru(ketqua.array,mang(p,t),t);
        break;
       case 2: ketqua=tru(mang(a,t),mang(b,t),t);
-              if(ketqua.nho==1) ketqua=cong(ketqua.array,mang(p,t),t); 
        break;
+      case 3:  ketqua=cong(mang(a,t),mang(b,t),t); 
+            if(ketqua.nho==1) ketqua=tru(ketqua.array,mang(p,t),t);  
+            else if(sosanh(ketqua.array,mang(p,t))==true) ketqua=tru(ketqua.array,mang(p,t),t);      
+       break;
+      case 4:  ketqua=tru(mang(a,t),mang(b,t),t);
+               if(ketqua.nho==1) ketqua=cong(ketqua.array,mang(p,t),t); 
+       break;
+
    }
   
   for(int j=0;j<t;j++)
